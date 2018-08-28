@@ -1,0 +1,36 @@
+<head >
+    <link rel="icon" href="1.ico" type="img/x-ico" />
+    <title>火火的小窝</title>
+
+</head>
+<body background="1.jpg">
+    <div align="center">欢迎来到火火的大数据</div>
+    <form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="查天气">
+    </form>
+    <form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="查党建知识">
+    </form>
+    <div  style="text-align: center; position: fixed; bottom: 0px;">Copyright@2018-2019 sihuo</div>
+    <div style="position: absolute; bottom: 10px; right: 10px;">
+
+        <table width="400" height="35" border="0" align="center">
+            <tr>
+                <td>
+                友情链接：&nbsp;&nbsp;
+                <a target="_blank" href="http://www.xaufe.edu.cn/">西安财经大学</a>
+                &nbsp;|&nbsp;
+                <a target="_blank" href="https://www.zhihu.com/">知乎</a>
+                &nbsp;|&nbsp;
+                <a target="_blank" href="http://www.cpdasoft.com/">芝诺数据</a>
+                &nbsp;|&nbsp;
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
