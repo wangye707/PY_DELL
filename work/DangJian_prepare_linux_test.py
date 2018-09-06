@@ -5,56 +5,26 @@
 # @Date  : 2018/8/27
 # @Software: PyCharm
 # coding: utf-8
-import numpy
+# import numpy
 import jieba
-import os
-from threading import Thread
-import time
-from os import walk
+# import os
+# from threading import Thread
+# import time
+# from os import walk
 #import CSVOP
 import codecs
-from datetime import datetime
+# from datetime import datetime
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
-from time import time
+# from elasticsearch.helpers import bulk
+# from time import time
 import os
 import sys
-import fnmatch
-import win32com.client
+# import fnmatch
+# import win32com.client
 PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 #print(PATH)
 
 # 主要执行函数
-'''将docx转化为txt'''
-def docx_to_text():
-    wordapp = win32com.client.\
-        gencache.EnsureDispatch("Word.Application")
-    try:
-        for root, dirs, files\
-                in os.walk(PATH_DATA):
-            #root代表路径,dirs代表目录，files代表文件名
-            print(root,dirs,files)
-            for _dir in dirs:   #若是目录，跳过
-                pass
-            for _file in files:  #若是文件，转化为txt
-                if not fnmatch.\
-                        fnmatch(_file, '*.docx'):
-                    #若是docx结尾，才进行操作
-                    continue
-                word_file = os.path.join(root, _file)
-                wordapp.Documents.Open(word_file)
-                #打开word文件
-                docastxt = word_file[:-4] + 'txt'
-                #新建txt的文件名
-                wordapp.ActiveDocument\
-                    .SaveAs(
-                    docastxt,
-                    FileFormat=
-                    win32com.client.constants.wdFormatText)
-                wordapp.ActiveDocument.Close()
-    finally:
-        wordapp.Quit()
-    print("well done!")
 '''遍历TXT文件并且调用es插入数据'''
 
 
@@ -356,8 +326,8 @@ if __name__ == '__main__':
     doc_type="zeno"
     ip='localhost'
     wy = ElasticWy(index_name, doc_type, ip)
-    PATH_DATA = r'C:\Users\wy\Desktop\Data_Test' #数据插入目录
-    PATH_update=r'C:\Users\wy\Desktop\Insert'  #更新数据路径
+    PATH_DATA = '/usr/soft/wy/Data_Test' #数据插入目录
+    PATH_update='/usr/soft/wy/Insert'  #更新数据路径
     while(1):
         print("请输入需要执行的操作：")
         print('1.查询')

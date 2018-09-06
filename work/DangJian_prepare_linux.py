@@ -20,54 +20,24 @@ from time import time
 import os
 import sys
 import fnmatch
-import win32com.client
+#import win32com.client
 PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 #print(PATH)
-
+PATH_DATA=r'./DangJian_prepare'
 # 主要执行函数
 '''将docx转化为txt'''
-def docx_to_text():
-    wordapp = win32com.client.\
-        gencache.EnsureDispatch("Word.Application")
-    try:
-        for root, dirs, files\
-                in os.walk(PATH_DATA):
-            #root代表路径,dirs代表目录，files代表文件名
-            print(root,dirs,files)
-            for _dir in dirs:   #若是目录，跳过
-                pass
-            for _file in files:  #若是文件，转化为txt
-                if not fnmatch.\
-                        fnmatch(_file, '*.docx'):
-                    #若是docx结尾，才进行操作
-                    continue
-                word_file = os.path.join(root, _file)
-                wordapp.Documents.Open(word_file)
-                #打开word文件
-                docastxt = word_file[:-4] + 'txt'
-                #新建txt的文件名
-                wordapp.ActiveDocument\
-                    .SaveAs(
-                    docastxt,
-                    FileFormat=
-                    win32com.client.constants.wdFormatText)
-                wordapp.ActiveDocument.Close()
-    finally:
-        wordapp.Quit()
-    print("well done!")
+
 '''遍历TXT文件并且调用es插入数据'''
 
 
-def readfile(path):
+def readfile():
     docx_name=[]   #存储文件名
     filename=[]   #存储文件种类名
     all_file=[]    #存储所有文件
     #filename_fenci=[]
     #temp1=[]
-    PATH_DATA=path
     print('文件开始读取')
     x=-1
-    id=1
     try:
         for root, dirs, files in os.walk(PATH_DATA):
             #print(x)
@@ -132,10 +102,7 @@ def readfile(path):
                                     filename_fenci,
                                     content,
                                     content_fenci,
-                                    cishu,
-                                    str(id)
-                                    )
-                            id = id + 1
+                                    cishu)
 
                             cishu = cishu + 1
 
@@ -175,9 +142,8 @@ def readfile(path):
                                     filename_fenci,
                                     content,
                                     content_fenci,
-                                    cishu,
-                                    str(id))
-                            id = id +1
+                                    cishu)
+
                             cishu = cishu + 1
 
                     #temp_content.append(temp)
@@ -194,7 +160,6 @@ def readfile(path):
 
     finally:
         print("文件读取完成")
-#readfile()
 '''文件操作结束，开始es'''
 '''文件操作结束，开始es'''
 '''文件操作结束，开始es'''
@@ -253,26 +218,19 @@ class ElasticWy:
         else:
             print("错误：文件目录不存在或文件不存在")
     def Index_Data(self,category,docname,docname_fenci,
-                   content,content_fenci,cishu,id):
+                   content,content_fenci,cishu):
 
-        if content!=None:   #判断是否为表类型
+        if isinstance(content,list):   #判断是否为表类型
             #print('插入数据')
            # for category,name,line in namelist,docname,filelist:
 
             action = {
-                # # "_index": self.index_name,
-                # # "_type": self.index_type,
-                # # #"_id": id,  # _id 也可以默认生成，不赋值
-                # "source":
-                #     {
-                        'category': category,
-                        'name': docname,
-                        'name_fenci': docname_fenci,
-                        "title": content,
-                        'title_fenci': content_fenci,
-                        "id": id,  # _id
-                        }
-           # }
+                    'category': category,
+                    'name': docname,
+                    'name_fenci': docname_fenci,
+                    "title": content,
+                    'title_fenci': content_fenci
+                    }
             #ACTIONS.append(action)
             self.es.index(index=self.index_name,
                           doc_type=self.index_type,
@@ -306,7 +264,6 @@ class ElasticWy:
         last_docxname_fenci=[]
         last_sentence = []
         last_sentence_fenci=[]
-        last_id=[]
         for hit in _searched['hits']['hits']:
             #print (hit['_source'])
             #print ( hit['_source']['title'])
@@ -324,102 +281,45 @@ class ElasticWy:
                 .append(hit['_source']['name_fenci'])
             last_sentence.append(hit['_source']['title'])
             last_sentence_fenci.append(hit['_source']['title_fenci'])
-            last_id.append(hit['_id'])
             i=i+1
             if i==2:
                 break
         #print(len(last_sentence))
-        for temp in last_sentence:
-            print('原文',temp)
-        for temp in last_sentence_fenci:
-            print('分词',temp)
-        print('内容分类',last_category)
-        print('分档名',last_docxname)
-        print('文档名_分词',last_docxname_fenci)
-        print('delete_key',last_id)
+        # for temp in last_sentence:
+        #     print('原文',temp)
+        # for temp in last_sentence_fenci:
+        #     print('分词',temp)
+        # print('内容分类',last_category)
+        # print('分档名',last_docxname)
+        # print('文档名_分词',last_docxname_fenci)
+        return last_sentence,last_sentence_fenci,last_category\
+            ,last_docxname,last_docxname_fenci
         #cost_time = time()-start_time
         #print(cost_time)
-    def delete_content(self,index_name,doc_type,key):
-        print('准备删除操作')
-        try:
-            wy.es.delete(index_name, doc_type, id=key)
-            #print('删除成功')
-        except :
-            print('我猜您输入的 delete_key 很可能不存在，请根据（ 1.查询 ）中反馈的 delete_key 进行删除操作')
-        else:
-            print('删除成功')
-
-
+def a(question):
+    last_sentence=wy.Search_data(input_text)[0]
+    last_sentence_fenci=wy.Search_data(input_text)[1]
+    last_category=wy.Search_data(input_text)[2]
+    last_docxname=wy.Search_data(input_text)[3]
+    last_docxname_fenci=wy.Search_data(input_text)[4]
+    print(last_docxname_fenci)
+    return last_sentence, last_sentence_fenci, last_category \
+        , last_docxname, last_docxname_fenci
 
 if __name__ == '__main__':
-    index_name='dj_fgzd'
-    doc_type="zeno"
-    ip='localhost'
-    wy = ElasticWy(index_name, doc_type, ip)
-    PATH_DATA = r'C:\Users\wy\Desktop\Data_Test' #数据插入目录
-    PATH_update=r'C:\Users\wy\Desktop\Insert'  #更新数据路径
+    wy = ElasticWy("dj_fgzd", "zeno", ip="139.129.129.77")
+    wy.create_index(index_name="dj_fgzd",index_type="zeno")
+    readfile()
+    # # #return filename, all_file, docx_name
+    # # docname=readfile()[2]
+    # # filelist=readfile()[1]
+    # # namelist=readfile()[0]
     while(1):
-        print("请输入需要执行的操作：")
-        print('1.查询')
-        print('2.删除')
-        print('3.插入')
-        print('4.更新')
-        print('0.退出')
-        input_num = input()
-        if input_num == str(1):
-        #print("请输入需要执行的操作：")
-            while(1):
-                print("请输入与要匹配的字符串,输入 0 返回")
-                input_text = input()
-                if input_text != str(0):
-                    print('查询结果如下')
-                    wy.Search_data(input_text=input_text)
-                else:
-                    print("查询终止")
-                    break
-        # '''删除'''
-        if input_num == str(2):
-            while(1):
-                print("请输入与要删除的ID,输入 0 返回")
-                input_text = input()
-                if input_text != str(0):
-                    #print('查询结果如下')
-                    wy.delete_content(index_name, doc_type,input_text)
-                    #wy.Search_data(input_text=input_text)
-                else:
-                    print("删除终止")
-                    break
-        if input_num == str(3):
-            print('插入操作将会插入所有库中的文件，插入各个参数为：')
-            print('PATH_DATA：',PATH_DATA)
-            print('index_name:',index_name)
-            print('doc_type:',doc_type)
-            print('ip:',ip)
-            print('输入 1 继续,按其他任意键返回上一层')
-            str_select=input()
-            if str_select == str(1):
-                print('开始执行插入操作')
-                wy.create_index(index_name=index_name, index_type=doc_type)
-                readfile(PATH_DATA)
-                print('插入操作执行完成')
-            else:
-                continue
-        if input_num == str(4):
-            print('开始读入更新路径文件夹')
-            try:
-                readfile(PATH_update)
-            except FileNotFoundError:
-                print("路径未读取到，"
-                      "请将更新文件放入'C:\\Users\\wy\\Desktop\\Insert'下’,如："
-                      "'C:\\Users\wy\\Desktop\\Insert\\0新名词\\百科.py'")
-            except ConnectionRefusedError:
-                print('ElasticSearch 链接出现问题')
-            except:
-                print('未知错误')
-            else:
-                print('文件更新成功')
-        if input_num == str(0):
+        print("请输入与要匹配的字符串,输入 0 终止查询")
+        input_text = input()
+        if input_text != str(0):
+            print('查询结果如下')
+            wy.Search_data(input_text=input_text)
+        else:
+            print("查询终止")
             break
-        # if input_num != str(0) or str(1) or str(2) or str(3):
-        #     print('你他妈是傻逼吗？看不清楚输入是几？看清楚输入数字！猪！重输')
-        #     continue

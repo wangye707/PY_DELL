@@ -4,6 +4,7 @@
 # @Author: WangYe
 # @Date  : 2018/8/1
 # @Software: PyCharm
+import tensorflow.keras
 import numpy as np
 np.random.seed(1337)
 

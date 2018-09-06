@@ -7,14 +7,14 @@ Created on Mon Nov 27 09:50:43 2017
 import tensorflow as tf
 
 class QaNet(object):
-	def __init__(self,batchSize,timeStep,embeddings,embeddingSize,rnnSize,margin,attention_matrix_size):
-		self.batchSize = batchSize    #	批的大小
-		self.timeStep = timeStep	#时间步数
-		self.embeddings = embeddings	#词嵌入矩阵
-		self.embeddingSize= embeddingSize  #词维度矩阵
-		self.rnnSize = rnnSize			#RNN的神经元个数
-		self.margin = margin			#margin
-		self.attention_matrix_size = attention_matrix_size   #注意力矩阵大小
+	def __init__(self, batchSize, timeStep, embeddings, embeddingSize, rnnSize, margin, attention_matrix_size):
+		self.batchSize = batchSize
+		self.timeStep = timeStep
+		self.embeddings = embeddings
+		self.embeddingSize= embeddingSize
+		self.rnnSize = rnnSize
+		self.margin = margin
+		self.attention_matrix_size = attention_matrix_size
 
 		self.inputQuestions = tf.placeholder(tf.int32,shape=[None,self.timeStep])
 		self.inputTrueAnswers = tf.placeholder(tf.int32,shape=[None,self.timeStep])
@@ -119,7 +119,7 @@ class QaNet(object):
 		zero = tf.fill(tf.shape(trueCosSim), 0.0)
 		margin = tf.fill(tf.shape(trueCosSim), self.margin)
 		with tf.name_scope("loss"):
-			losses = tf.maximum(zero, tf.subtract(margin, tf.subtract(trueCosSim, falseCosSim)))
+		    losses = tf.maximum(zero, tf.subtract(margin, tf.subtract(trueCosSim, falseCosSim)))
 		    loss = tf.reduce_sum(losses) 
 		# cal accurancy
 		with tf.name_scope("acc"):
