@@ -354,7 +354,7 @@ class ElasticWy:
 if __name__ == '__main__':
     index_name='dj_fgzd'
     doc_type="zeno"
-    ip='localhost'
+    ip='139.129.129.77'
     wy = ElasticWy(index_name, doc_type, ip)
     PATH_DATA = r'C:\Users\wy\Desktop\Data_Test' #数据插入目录
     PATH_update=r'C:\Users\wy\Desktop\Insert'  #更新数据路径

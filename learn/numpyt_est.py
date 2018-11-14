@@ -4,7 +4,7 @@
 # @Author: WangYe
 # @Date  : 2018/4/16
 # @Software: PyCharm
-import numpy;
+import numpy
 
 print('使用列表生成一维数组')
 data = [1,2,3,4,5,6]
@@ -14,6 +14,7 @@ print (x.dtype) #打印数组元素的类型
 
 print ('使用列表生成二维数组')
 data = [[1,2],[3,4],[5,6]]
+
 x = numpy.array(data)
 print(x) #打印数组
 print(x.ndim)#打印数组的维度

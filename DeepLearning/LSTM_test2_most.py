@@ -90,6 +90,8 @@ with open('C:/Users/wy/Desktop/data/RNN_LSTM/train_data.txt'
 X = sequence.pad_sequences(X, maxlen=MAX_SENTENCE_LENGTH)
 #print(X)
 ## 数据划分
+print(X.shape)
+print(y.shape)
 Xtrain, Xtest, ytrain, ytest =\
     train_test_split(X, y, test_size=0.2, random_state=42)
                         #样本比例，如果是整数的话就是样本的数量

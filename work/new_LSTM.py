@@ -16,8 +16,7 @@ import jieba
 import os
 '''读取文件'''
 def write_file():
-    path='C:\\Users\\wy\\Desktop\\data\\' \
-         'RNN_LSTM\\training.xls'
+    path='.\\training.xls'
     question=[]
     answer=[]
     label=[]

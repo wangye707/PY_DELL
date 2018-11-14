@@ -18,17 +18,17 @@ import base64
 import numpy as np
 
 def main():
-    f = open(r"C:\Users\wy\Desktop\data\科大讯飞输出\test.wav", 'rb')
+    f = open(r"C:\Users\wy\Desktop\data\科大讯飞输出\test_1.pcm", 'rb')
     # rb表示以二进制格式只读打开文件
     #f = open("sw02725-A_018202-018583#sw02141-B_013798-014064.wav")
-    f.seek(0)
-    f.read(44)
-    data = np.fromfile(f, dtype=np.int16)
-    data.tofile("test.pcm")
+    # f.seek(0)
+    # f.read(44)
+    # data = np.fromfile(f, dtype=np.int16)
+    # data.tofile("test.pcm")
 
 
     #file_content = f.read()
-    file_content=data
+    file_content=f.read()
     # file_content 是二进制内容，bytes类型
     # 由于Python的字符串类型是str，在内存中以Unicode表示，一个字符对应若干个字节。
     # 如果要在网络上传输，或者保存到磁盘上，就需要把str变为以字节为单位的bytes
@@ -94,7 +94,7 @@ def main():
     result = result.read().decode('utf-8')
     # 返回的数据需要再以utf-8解码
 
-    print('1',result)
+    print('结果',result)
     return
 
 

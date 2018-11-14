@@ -19,11 +19,7 @@ import jieba
 # print(res)
 # res=res.argsort()#按降序排列，输出下
 # 标号
-a=["我在东北玩泥巴"]
-a=str(a[0])
-print(type(a))
-b=[]
-b=jieba.cut(a)
-for x in b:
-    print(x)
-print(b)
+a=[]
+a.append(1)
+a.append(2)
+print(a)
