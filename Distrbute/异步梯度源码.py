@@ -45,6 +45,7 @@ from tensorflow.python.training import session_run_hook
 # rate according to the number of replicas. This change is introduced to be
 # consistent with how gradients are aggregated (averaged) within a batch in a
 # replica.
+#test_github_pycharm
 class SyncReplicasOptimizer(optimizer.Optimizer):
   """Class to synchronize, aggregate gradients and pass them to the optimizer.
 
@@ -171,7 +172,7 @@ class SyncReplicasOptimizer(optimizer.Optimizer):
     """
     if total_num_replicas is None:
       total_num_replicas = replicas_to_aggregate
-
+#大段大段大段大段大段大段大段大段大段多多多
     super(SyncReplicasOptimizer, self).__init__(use_locking, name)
     logging.info(
         "SyncReplicasV2: replicas_to_aggregate=%s; total_num_replicas=%s",
