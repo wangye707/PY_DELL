@@ -3,7 +3,7 @@ import tensorflow as tf
 #from tensorflow.examples.tutorials.mnist import input_data
 import os
 import time
-
+#dsadasdasdasd
 flags = tf.app.flags
 flags.DEFINE_string("data_dir", r"/usr/wangye/mnist", "the directory of mnist_data")
 #flags.DEFINE_integer("train_step",50000, "the step of train")
