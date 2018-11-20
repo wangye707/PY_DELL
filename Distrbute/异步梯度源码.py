@@ -315,7 +315,7 @@ class SyncReplicasOptimizer(optimizer.Optimizer):
                                     name="sync_token_q",
                                     shared_name="sync_token_q"))
         self._sync_token_queue = sync_token_queue
-
+#的点点滴滴多
         # dummy_queue is passed to the queue runner. Don't use the real queues
         # because the queue runner doesn't automatically reopen it once it
         # closed queues in PS devices.
