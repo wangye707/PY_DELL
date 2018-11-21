@@ -73,7 +73,6 @@ hidden_num = 128
 n_classes = 2
 x = tf.placeholder(dtype=tf.float32, shape=[None,41], name="inputx")
 y = tf.placeholder(dtype=tf.float32, shape=[None,2], name="expected_y")
-
 weights = tf.Variable(tf.truncated_normal(shape=[hidden_num, n_classes],stddev=0.1))
 bias = tf.Variable(tf.constant(0.1,shape=[n_classes]))
 
