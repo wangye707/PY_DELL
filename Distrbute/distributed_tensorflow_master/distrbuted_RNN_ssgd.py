@@ -17,7 +17,7 @@ FLAGS = tf.app.flags.FLAGS
 # tf.app.flags.DEFINE_float('learning_rate', 0.00003, 'Initial learning rate.')
 # tf.app.flags.DEFINE_integer('steps_to_validate', 1000,
 #                      'Steps to validate and print loss')
-#到的
+#
 # For distributed
 tf.app.flags.DEFINE_string("ps_hosts","192.168.1.124:11111",
                            "Comma-separated list of hostname:port pairs")
