@@ -179,6 +179,10 @@ def main(_):
                 sess.run(init_token_op)
             step = 0
             testx, testy = Xtest, ytest
+
+            #=len(Xtest)
+
+
             while step < train_step:
                 batch_x, batch_y = Xtrain, ytrain
                 _, loss_v, step = sess.run([train_op, loss_value, global_step],

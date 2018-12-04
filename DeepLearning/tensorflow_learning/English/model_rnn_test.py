@@ -101,7 +101,7 @@ accuracy=tf.reduce_mean(tf.to_float(correct_pred))
 grads_and_vars = optimizer.compute_gradients(loss_value)
 #按batch_size划分数据集
 Xtrains,ytrains=tf.train.batch([Xtrain,ytrain],batch_size=batch_size)
-del
+# del
 with tf.Session() as sess:
     tf.global_variables_initializer().run()
     step=10
