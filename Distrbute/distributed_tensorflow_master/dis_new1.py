@@ -1,5 +1,11 @@
 #!D:/workplace/python
 # -*- coding: utf-8 -*-
+# @File  : dis_new1.py
+# @Author: WangYe
+# @Date  : 2018/12/10
+# @Software: PyCharm
+#!D:/workplace/python
+# -*- coding: utf-8 -*-
 # @File  : distrbuted_RNN.py
 # @Author: WangYe
 # @Date  : 2018/11/5
@@ -8,7 +14,7 @@
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import collections
-import nltk#用来分词
+#import nltk#用来分词
 import numpy as np#用来统计词频
 import os
 import time
@@ -17,14 +23,14 @@ FLAGS = tf.app.flags.FLAGS
 # tf.app.flags.DEFINE_float('learning_rate', 0.00003, 'Initial learning rate.')
 # tf.app.flags.DEFINE_integer('steps_to_validate', 1000,
 #                      'Steps to validate and print loss')
-#到的
+#
 # For distributed
-tf.app.flags.DEFINE_string("ps_hosts","192.168.1.124:11111",
+tf.app.flags.DEFINE_string("ps_hosts","192.168.1.114:11111",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker_hosts", "192.168.1.124:11112",
+tf.app.flags.DEFINE_string("worker_hosts", "192.168.1.114:11112,192.168.1.114:11113,192.168.1.114:11114",
                            "Comma-separated list of hostname:port pairs")
 tf.app.flags.DEFINE_string("job_name", "", "One of 'ps', 'worker'")
-tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
+tf.app.flags.DEFINE_integer("task_index",0, "Index of task within the job")
 tf.app.flags.DEFINE_integer("issync", 0, "是否采用分布式的同步模式，1表示同步模式，0表示异步模式")
 tf.app.flags.DEFINE_string("cuda", "", "specify gpu")
 #FLAGS = tf.app.flags.FLAGS
@@ -77,17 +83,15 @@ y=np.array(y_temp).reshape(num_recs,2)
 # print(y.shape)
 Xtrain, Xtest, ytrain, ytest =\
     train_test_split(X, y, test_size=0.2, random_state=42)
-# print(Xtrain.shape)
-# print(ytrain.shape)
-# print(Xtest.shape)
-# print(ytest.shape)
+print(Xtrain.shape)
+print(ytrain.shape)
+print(Xtest.shape)
+print(ytest.shape)
 '''文本预处理完毕'''
 
 learning_rate = 0.001
-batch_size = 2
-'''分布式优化切分batch_size：mini_batch'''
-#mini_batch = 100
-train_step = 10000
+batch_size = 2000
+train_step = 1000
 display_step = 100
 
 frame_size = 41
@@ -97,6 +101,15 @@ sequence_length = 7086
 hidden_num = 128
 n_classes = 2
 start=time.time()
+
+def get_batches(x, y, batch_size=100):
+    n_batches = len(x) // batch_size
+    #  // 指 取整除 - 返回商的整数部分（向下取整
+    x, y = x[:n_batches*batch_size], y[:n_batches*batch_size]
+
+    for ii in range(0, len(x), batch_size):
+        yield x[ii:ii+batch_size], y[ii:ii+batch_size]
+
 def RNN(x,weights,bias):
     x=tf.reshape(x,shape=[-1,41,1])
     # print(type(x))
@@ -110,15 +123,6 @@ def RNN(x,weights,bias):
 def loss1(label, pred):
     return tf.square(label - pred)
 
-
-def get_batches(x, y, batch_size=100):
-    n_batches = len(x) // batch_size
-    #  // 指 取整除 - 返回商的整数部分（向下取整
-    x, y = x[:n_batches*batch_size], y[:n_batches*batch_size]
-
-    for ii in range(0, len(x), batch_size):
-        yield x[ii:ii+batch_size], y[ii:ii+batch_size]
-
 def main(_):
     ps_hosts = FLAGS.ps_hosts.split(",")
     worker_hosts = FLAGS.worker_hosts.split(",")
@@ -129,7 +133,6 @@ def main(_):
     if FLAGS.job_name == "ps":
         server.join()
     elif FLAGS.job_name == "worker":
-
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
                 cluster=cluster)):
@@ -144,51 +147,28 @@ def main(_):
 
             #loss_value = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=predy, labels=y))
             #train = tf.train.AdamOptimizer(train_rate).minimize(cost)
-            #next_batch = None
             loss_value = loss1(y, predy)
             optimizer = tf.train.GradientDescentOptimizer(learning_rate)
 
             correct_pred = tf.equal(tf.argmax(predy, 1), tf.argmax(y, 1))
             accuracy = tf.reduce_mean(tf.to_float(correct_pred))
-            #根据batch_size规划出梯度
+
             grads_and_vars = optimizer.compute_gradients(loss_value)
-
-            # step = 0
-            # testx, testy = Xtest, ytest
-            # while step < train_step:
-            #     #batch_x, batch_y = Xtrain, ytrain
-            #     for ii, (Xtrains, ytrains) in enumerate(get_batches(Xtrain, ytrain, batch_size), 1):
-            #         #同步
-            #         X_big = Xtrains
-            #         y_big = ytrains
-
-
-            #
             if issync == 1:
                 # 同步模式计算更新梯度
-                # 调用服务器
-                #assgd_op = optimizer.apply_gradients(grads_and_vars,
-                   #                                  global_step=global_step)
-
-
                 rep_op = tf.train.SyncReplicasOptimizer(optimizer,
-                                                        replicas_to_aggregate=100,
+                                                        replicas_to_aggregate=3,
                                    #                     replica_id=FLAGS.task_index,
-                                                        total_num_replicas=len(
-                                                            worker_hosts),
+                                                        total_num_replicas=3,
                                                         use_locking=True)
-                #rep存储分布式信息
-                #同步样本分配
                 train_op = rep_op.apply_gradients(grads_and_vars,
                                                   global_step=global_step)
                 init_token_op = rep_op.get_init_tokens_op()
-                chief_queue_runner = rep_op.get_chief_queue_runner()  #同步等待机制
+                chief_queue_runner = rep_op.get_chief_queue_runner()
             else:
-                #异步模式计算更新梯度
+                # 异步模式计算更新梯度
                 train_op = optimizer.apply_gradients(grads_and_vars,
                                                      global_step=global_step)
-
-
 
             init_op = tf.initialize_all_variables()
 
@@ -208,44 +188,30 @@ def main(_):
         with sv.prepare_or_wait_for_session(server.target) as sess:
             # 如果是同步模式
             if FLAGS.task_index == 0 and issync == 1:
-            #next_batch = next_batch + 1
-                sv.start_queue_runners(sess, [chief_queue_runner])   #启动队列（同步等待机制）
+                sv.start_queue_runners(sess, [chief_queue_runner])
                 sess.run(init_token_op)
-
-
             step = 0
-            next_batch = 0
             testx, testy = Xtest, ytest
             while step < train_step:
                 #batch_x, batch_y = Xtrain, ytrain
                 for ii, (Xtrains, ytrains) in enumerate(get_batches(Xtrain, ytrain, batch_size), 1):
-                    #同步
-                    X_big = Xtrains
-                    y_big = ytrains
-                    #if next_batch == step:
-                        #for iii,(miniX,miniy) in enumerate(get_batches(X_big,y_big,mini_batch),1):
-
-
-                            #minibatch异步
-                    feed = {x: Xtrains,
-                                    # y : ytrains[:,None]
-                            y: ytrains
-                            }
+                    feed = {x: Xtrains,y: ytrains}
                            # print("aaaaaaaaaaaaaaaaa")
                     _, loss_v, step = sess.run([train_op, loss_value, global_step],
                                                        feed_dict=feed)
                    # print('minibatch', iii)
 
-                if step % display_step == 0:
-                    acc, loss = sess.run([accuracy, loss_value], feed_dict={x: testx, y: testy})
-                        #print('train:', step, acc, loss)
+                    if step % display_step == 0:
+                        acc, loss = sess.run([accuracy, loss_value], feed_dict={x: testx, y: testy})
+                        print('train:', step)
 
-                    print('bigbatch',ii)
+                        #print('bigbatch',ii)
 
-                if step % display_step == 0:
-                    acc, loss = sess.run([accuracy, loss_value], feed_dict={x: testx, y: testy})
-                        #print('test:', step, acc, loss)
+                    # if step % display_step == 0:
+                    #     acc, loss = sess.run([accuracy, loss_value], feed_dict={x: testx, y: testy})
+                    #         #print('test:', step, acc, loss)
                 #step=step+1
+
         #sv.stop()
         end=time.time()
         print("costing time:", end - start)

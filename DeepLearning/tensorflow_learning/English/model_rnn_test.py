@@ -80,6 +80,15 @@ bias = tf.Variable(tf.constant(0.1,shape=[n_classes]))
 def loss1(label, pred):
     return tf.square(label - pred)
 
+
+def get_batches(x, y, batch_size=100):
+    n_batches = len(x) // batch_size
+    #  // 指 取整除 - 返回商的整数部分（向下取整
+    x, y = x[:n_batches*batch_size], y[:n_batches*batch_size]
+
+    for ii in range(0, len(x), batch_size):
+        yield x[ii:ii+batch_size], y[ii:ii+batch_size]
+
 def RNN(x,weights,bias):
     x=tf.reshape(x,shape=[-1,41,1])
     # print(type(x))
@@ -100,7 +109,7 @@ accuracy=tf.reduce_mean(tf.to_float(correct_pred))
 
 grads_and_vars = optimizer.compute_gradients(loss_value)
 #按batch_size划分数据集
-Xtrains,ytrains=tf.train.batch([Xtrain,ytrain],batch_size=batch_size)
+#Xtrains,ytrains=tf.train.batch([Xtrain,ytrain],batch_size=batch_size)
 # del
 with tf.Session() as sess:
     tf.global_variables_initializer().run()
@@ -111,20 +120,27 @@ with tf.Session() as sess:
         num=num+1
         #start_x=step*batch_size%len(Xtrain)
 
-        batch_x,batch_y=Xtrains[num],ytrains[num]
+        #batch_x,batch_y=Xtrains[num],ytrains[num]
 
         #batch_x=tf.reshape(batch_x,shape=[sequence_length,frame_size])
-        _loss,__=sess.run([loss_value,grads_and_vars],feed_dict={x:batch_x,y:batch_y})
-        if step % display_step ==0:
+        for ii, (Xtrains, ytrains) in enumerate(get_batches(Xtrain, ytrain, batch_size), 1):
+            feed = {x : Xtrains,
+                   # y : ytrains[:,None]
+                    y: ytrains
 
-            acc,loss=sess.run([accuracy,loss_value],feed_dict={x:testx,y:testy})
-            print('train:',step,acc,loss)
+                    }
+           # print("aaaaaaaaaaaaaaaaa")
+            _loss,__=sess.run([loss_value,grads_and_vars],feed_dict=feed)
+            if step % display_step ==0:
 
-        if step % display_step ==0:
+                acc,loss=sess.run([accuracy,loss_value],feed_dict={x:testx,y:testy})
+                print('train:',step,acc,loss)
 
-            acc,loss=sess.run([accuracy,loss_value],feed_dict={x:testx,y:testy})
-            print('test:',step,acc,loss)
+            if step % display_step ==0:
 
-        step+=1
+                acc,loss=sess.run([accuracy,loss_value],feed_dict={x:testx,y:testy})
+                print('test:',step,acc,loss)
+
+            step+=1
 end=time.time()
 print("costing time:",end-start)
