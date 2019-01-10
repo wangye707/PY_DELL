@@ -11,6 +11,9 @@ test_acrostic_poetry.py 生成藏头诗(五言或七言) win10 python3.6.1 tenso
 poetry_file ='data/poetry.txt'
 # 诗集
 poetrys = []
+from keras.models import Sequential
+model=Sequential()
+model.fit()
 with open(poetry_file, "r", encoding='utf-8') as f:
     for line in f:
         try:

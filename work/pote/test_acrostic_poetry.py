@@ -193,6 +193,7 @@ def gen_head_poetry(heads, type):
 #             print(res)
 #         else:
 #             break
-print(gen_head_poetry('我爱你',5))
+print("da")
+print(gen_head_poetry('我的',5))
 #tf.reset_default_graph()
-print(gen_head_poetry("我的骄傲",7))
+# print(gen_head_poetry("我的骄傲",7))
